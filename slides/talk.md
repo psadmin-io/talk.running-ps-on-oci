@@ -29,7 +29,7 @@ ODA, or Oracle Database Appliance, is an engineered system (like Exadata and Exa
 At the time, OPC was Oracle's main cloud. Shortly after we migrated to OPC (then renamed OCI-C), OCI was launched.
 ---
 
-# Moving to Full Cloud
+# Moving to the Cloud
 
 * Migrated non-prod and DR to OCI (Q1/2019)
 ???
@@ -69,6 +69,88 @@ class: center, middle, black
 ---
 
 # Cloud Technologies
+
+Networking
+
+* Virtual Cloud Networks
+* Network Security Lists/Groups
+* Gateways
+
+---
+
+# Cloud Technologies
+
+High Availability
+
+* Regions
+* Availability Domains
+* Fault Domains
+* Load Balancing
+* Instance Pools
+
+---
+
+# Cloud Technologies
+
+Storage
+
+* Object Storage
+* File Storage System
+* Block Storage
+
+---
+
+# Architecting PeopleSoft
+
+Networking
+
+* Single VCN for PeopleSoft
+* Extend on-prem network to OCI via VPN
+  * Use 10. /24 CIDR block
+* Subnets for DMZ, Application, DR, Database
+* Common Security Lists applied to subnets
+  * Application, NFS, Database
+* Use Service Gateways for private access to OS
+* Use NAT Gateways for all non-DMZ traffic
+
+???
+
+
+
+---
+
+# Architecting PeopleSoft
+
+Networking
+
+<graphic from OKIT here>
+
+# Architecting PeopleSoft
+
+High Availability
+
+* Leverage Fault Domains
+  * Non-regional Subnets
+  * Exadata tied to an Availability Domain
+* Use Data Guard/rsync for replication to ODA
+* Running HA Proxy for Load Balancer
+  * OCI Load Balancer Limitations
+
+???
+
+---
+
+# Architecting PeopleSoft
+
+Storage
+
+* Object Storage for database backups
+* File Storage Service for
+  * Shared files
+  * PS_APP_HOME, PS_CFG_HOME
+  * Documentation
+
+???
 
 
 
