@@ -15,7 +15,7 @@ Welcome to our session on Running PeopleSoft on Oracle Cloud Infrastructure. Thi
 # Agenda
 
 1. Introduction
-1. Pre-Cloud and Migration
+1. Pre-Cloud and Migration to OCI
 1. Life in the Cloud
 1. Second Chances
 1. Questions

@@ -12,6 +12,7 @@ class: center, middle, black
 ???
 
 When we got involved, the servers were extremely outdated. The replacement for those servers had been pushed back due to cost and effort to replace the physical boxes. 
+
 ---
 
 # Why Move to Hybrid System
@@ -19,14 +20,16 @@ When we got involved, the servers were extremely outdated. The replacement for t
 * Oracle provided a study on a Hybrid system (2016)
 --
 * ODA on site for production
-  * 28-core system to 16-core system (ODA)
-??? 
+???
+
 ODA, or Oracle Database Appliance, is an engineered system (like Exadata and Exalogic), but is two node Oracle Linux RAC cluster in a single box with shared storage and networking all included in the box. It's smaller than an Exadata (size and price), but can also run application VMs.
 --
 * OCI-Classic for non-prod and DR
-  * Migrated to OCI-Classic (Q1/2017)
+    * Migrated to OCI-Classic (Q1/2017)
 ???
+
 At the time, OPC was Oracle's main cloud. Shortly after we migrated to OPC (then renamed OCI-C), OCI was launched.
+
 ---
 
 # Moving to the Cloud
@@ -66,17 +69,30 @@ class: center, middle, black
 
 # Life in the Cloud
 
---- 
+---
 
 # Cloud Technologies
 
-Compartments
+### Compartments and Tags
+
+---
+
+# Architecting PeopleSoft
+
+### Compartments and Tags
+
+* Single compartment for PeopleSoft
+* Free-form tags for tier and app
+
+???
+
+Sub compartments were not a feature when we started out build out. While they have been added, and you can easily move resources to new compartments, we opted to leave it as-is for now.
 
 ---
 
 # Cloud Technologies
 
-Networking
+### Networking
 
 * Virtual Cloud Networks
 * Network Security Lists/Groups
@@ -84,9 +100,35 @@ Networking
 
 ---
 
+# Architecting PeopleSoft
+
+### Networking
+
+* Single VCN for PeopleSoft
+* Extend on-prem network to OCI via VPN
+  * Use 10. /24 CIDR block
+  * Site-to-site VPN
+* Subnets for DMZ, Application, DR, Database
+* Common Security Lists applied to subnets
+  * Application, NFS, Database
+* Use Service Gateways for private access to OS
+* Use NAT Gateways for all non-DMZ traffic
+
+???
+
+---
+
+# Architecting PeopleSoft
+
+### Networking
+
+<graphic from OKIT here>
+
+---
+
 # Cloud Technologies
 
-High Availability
+### High Availability
 
 * Regions
 * Availability Domains
@@ -96,86 +138,9 @@ High Availability
 
 ---
 
-# Cloud Technologies
-
-Storage
-
-* Object Storage
-* File Storage System
-* Block Storage
-
----
-
-# Cloud Technologies
-
-Compute
-
-* Object Storage
-* File Storage System
-* Block Storage
-
----
-
-# Cloud Technologies
-
-Infrastructure as Code
-
-* Terraform
-* Resource Manager
-
----
-
-# Cloud Technologies
-
-Management
-
-* Monitoring and Notifications
-* Management Cloud
-* OS Management Service
-* Cloud Shell and CLI
-
----
-
 # Architecting PeopleSoft
 
-Compartments
-
-* Single compartment for PeopleSoft
-
-??? 
-
-Sub compartments were not a feature when we started out build out. While they have been added, and you can easily move resources to new compartments, we opted to leave it as-is for now.
-
----
-
-# Architecting PeopleSoft
-
-Networking
-
-* Single VCN for PeopleSoft
-* Extend on-prem network to OCI via VPN
-  * Use 10. /24 CIDR block
-* Subnets for DMZ, Application, DR, Database
-* Common Security Lists applied to subnets
-  * Application, NFS, Database
-* Use Service Gateways for private access to OS
-* Use NAT Gateways for all non-DMZ traffic
-
-???
-
-
-
----
-
-# Architecting PeopleSoft
-
-Networking
-
-<graphic from OKIT here>
-
-# Architecting PeopleSoft
-
-High Availability
+### High Availability
 
 * Leverage Fault Domains
   * Non-regional Subnets
@@ -188,9 +153,19 @@ High Availability
 
 ---
 
+# Cloud Technologies
+
+### Storage
+
+* Object Storage
+* File Storage System
+* Block Storage
+
+---
+
 # Architecting PeopleSoft
 
-Storage
+### Storage
 
 * Object Storage for database backups
 * File Storage Service for
@@ -205,11 +180,20 @@ Storage
 
 ---
 
+# Cloud Technologies
+
+### Infrastructure as Code
+
+* Terraform
+* Resource Manager
+
+---
+
 # Architecting PeopleSoft
 
-Infrastructure as Clode
+### Infrastructure as Clode
 
-* Used Terraform to most resources
+* Used Terraform to build most resources
 * Exceptions:
   * Users and some IAM policies
   * Exadata/DBs
@@ -217,9 +201,20 @@ Infrastructure as Clode
 
 ---
 
+# Cloud Technologies
+
+### Management
+
+* Monitoring and Notifications
+* Management Cloud
+* OS Management Service
+* Cloud Shell and CLI
+
+---
+
 # Architecting PeopleSoft
 
-Management
+### Management
 
 * Instances added to OMC for server monitoring
 * Adopting OSMS to replace scripts
@@ -239,21 +234,24 @@ With this, we will be building out their 9.2 system and get to learn from our ow
 A number of this are in our favor:
 
 * The timing is better; OCI has fixed a number of the limitations that stopped us from using a feature (regional subnets, LB shapes/hosts, NSGs)
-* We are not dependent on IT anymore so we can build out our own network
+* We are not dependent on IT anymore so we can build out our own network; less "over the wall" type issues when troubleshooting
 * We can use Cloud Manager as it doesn't support 9.1
 
 ---
 
 # Re-architecting PeopleSoft
 
-Compartments
+### Compartments
 
 * New PeopleSoft 9.2 Compartments
-  * PeopleSoft9.2
-    * Non-production 
-    * Production
-    * DR (?)
-* Leverage IAM Polices for 
+    * PeopleSoft9.2
+        * Non-production 
+        * Production
+        * DR (?)
+* Structured tags to support 
+    * Dynamic Groups (OSMS)
+    * Patching
+    * Budgeting
 
 ???
 
@@ -265,7 +263,7 @@ The plan is build DR in another region. Do we need separate policies for DR when
 
 # Re-architecting PeopleSoft
 
-Networking
+### Networking
 
 * Single VCN for PeopleSoft
   * Separate VCN for Database
@@ -277,19 +275,19 @@ Networking
 
 ???
 
+---
 
+# Re-architecting PeopleSoft
+
+### Networking
+
+<graphic from OKIT here>
 
 ---
 
 # Re-architecting PeopleSoft
 
-Networking
-
-<graphic from OKIT here>
-
-# Re-architecting PeopleSoft
-
-High Availability
+### High Availability
 
 * Leverage Availability Domains and Fault Domains
   * Regional Subnets
@@ -303,7 +301,7 @@ High Availability
 
 # Re-architecting PeopleSoft
 
-Storage
+### Storage
 
 * Expand File Storage Service for
   * PS_HOME/Middleware
@@ -317,7 +315,7 @@ Storage
 
 # Re-architecting PeopleSoft
 
-Infrastructure as Clode
+### Infrastructure as Clode
 
 * Integration Terraform with Resource Manager
   * Gitlab integration
@@ -327,7 +325,7 @@ Infrastructure as Clode
 
 # Re-architecting PeopleSoft
 
-Management
+### Management
 
 * Push notifications to WebHooks/PagerDuty
 * Add OMC log agent to 9.2 instances
@@ -335,20 +333,70 @@ Management
 * Leverage Cloud Manager for PeopleSoft Images
 
 ---
+class: center, middle, white
 
 # psadmin.io Cloud Operations
 
+???
 
+* Announcing psadmin.io Cloud Operations, or ioCloudOps
+* We have been building our own preferred toolset and methodology for a modern PeopleSoft deployment
+* New methodologies, using a Cloud first approach
+* Leverage cloud APIs and tooling
 
 ---
-class: center, middle, title
-# Title
+
+# psadmin.io Cloud Operations
+
+### Methodology
+
+* Align with Agile, DevOps and IaC
+* Leverage cloud tools and APIs
+* Monitoring and Notifications
+* Compartments, Tags, Budget
+* [psadmin.io/oci](https://psadmin.io/oci)
+
+???
+
+* We spent a lot of time doing this
+* Putting what we learned with DPK, OCI in one place
+* NOT a one size fits all, but lays out examples of choices YOU can make
+* If you are interested in working with us, checkout out website
+    * OCI
+    * Automated Deployments, Patching
+    * Tools upgrades
+
 ---
-class: center, middle, black
-# Black
+
+# psadmin.io Cloud Operations
+
+### Toolset
+
+* Terraform and OCI Resource Manager
+* Cloud Manager
+* DPK, psadmin.io Puppet modules
+* `psadmin-plus`
+* `ioco`
+
 ---
-class: center, middle, white
-# White
+
+# ioco
+### psadmin.io Cloud Operations Utility
+
+A python utility for common tasks related to administering PeopleSoft in the Cloud
+
+[github.com/psadmin-io/ioco](https://github.com/psadmin-io/ioco)
+
 ---
-class: center, middle, gray
-# Gray
+
+# Examples
+
+* `ioco oci block --make-file-system --mount`
+* `ioco cm attach-dpk-files`
+* `ioco dpk deploy --dpk-type=FSCM`
+
+???
+
+* Create a default partition and file system on new block storage, then mount it
+* Attach the CM dpk files repo
+* Get DPK files from CM dpk files repo, then deploy a midtier setup

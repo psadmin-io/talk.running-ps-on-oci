@@ -1,1 +1,5 @@
 /* Override template style for this talk here */
+.title h1 {
+  padding-top: 15%;
+  padding-bottom: 15%;
+}
