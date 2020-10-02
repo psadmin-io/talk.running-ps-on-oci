@@ -66,6 +66,12 @@ class: center, middle, black
 
 # Life in the Cloud
 
+--- 
+
+# Cloud Technologies
+
+Compartments
+
 ---
 
 # Cloud Technologies
@@ -97,6 +103,48 @@ Storage
 * Object Storage
 * File Storage System
 * Block Storage
+
+---
+
+# Cloud Technologies
+
+Compute
+
+* Object Storage
+* File Storage System
+* Block Storage
+
+---
+
+# Cloud Technologies
+
+Infrastructure as Code
+
+* Terraform
+* Resource Manager
+
+---
+
+# Cloud Technologies
+
+Management
+
+* Monitoring and Notifications
+* Management Cloud
+* OS Management Service
+* Cloud Shell and CLI
+
+---
+
+# Architecting PeopleSoft
+
+Compartments
+
+* Single compartment for PeopleSoft
+
+??? 
+
+Sub compartments were not a feature when we started out build out. While they have been added, and you can easily move resources to new compartments, we opted to leave it as-is for now.
 
 ---
 
@@ -149,9 +197,146 @@ Storage
   * Shared files
   * PS_APP_HOME, PS_CFG_HOME
   * Documentation
+* Attached Block Storage on all instances
+  * Backup Policies
+  * Configurable Performance
 
 ???
 
+---
+
+# Architecting PeopleSoft
+
+Infrastructure as Clode
+
+* Used Terraform to most resources
+* Exceptions:
+  * Users and some IAM policies
+  * Exadata/DBs
+* Resource Manager only for Cloud Manager
+
+---
+
+# Architecting PeopleSoft
+
+Management
+
+* Instances added to OMC for server monitoring
+* Adopting OSMS to replace scripts
+* Using Instance Principals and CLI with Rundeck
+
+---
+class: center, middle, black
+
+# Second Chances
+
+???
+
+It's not very often you get to re-do a large migration like this. SPPS is in a unique situation. They migrated their PeopleSoft 9.1 application to OCI and are upgrading to 9.2 now.
+
+With this, we will be building out their 9.2 system and get to learn from our own lessons.
+
+A number of this are in our favor:
+
+* The timing is better; OCI has fixed a number of the limitations that stopped us from using a feature (regional subnets, LB shapes/hosts, NSGs)
+* We are not dependent on IT anymore so we can build out our own network
+* We can use Cloud Manager as it doesn't support 9.1
+
+---
+
+# Re-architecting PeopleSoft
+
+Compartments
+
+* New PeopleSoft 9.2 Compartments
+  * PeopleSoft9.2
+    * Non-production 
+    * Production
+    * DR (?)
+* Leverage IAM Polices for 
+
+???
+
+A question I am still working through - Do we need a DR compartment?
+
+The plan is build DR in another region. Do we need separate policies for DR when they really are production servers, just offline/standby in another region? I don't think so.
+
+---
+
+# Re-architecting PeopleSoft
+
+Networking
+
+* Single VCN for PeopleSoft
+  * Separate VCN for Database
+* Build our own network space
+  * Use 10. /16 CIDR block
+* Regional Subnets for DMZ, Application, DR
+* Limit Security Lists to common rules per subnets
+  * Network Security Groups for fine-grained access
+
+???
+
+
+
+---
+
+# Re-architecting PeopleSoft
+
+Networking
+
+<graphic from OKIT here>
+
+# Re-architecting PeopleSoft
+
+High Availability
+
+* Leverage Availability Domains and Fault Domains
+  * Regional Subnets
+  * Exadata tied to an Availability Domain
+* Use Data Guard/FSS/OS for data replication to DR
+* Use Instance Pools and OCI LB for HA and scalability
+
+???
+
+---
+
+# Re-architecting PeopleSoft
+
+Storage
+
+* Expand File Storage Service for
+  * PS_HOME/Middleware
+  * Leverage Cloud Manager Repository
+* Backup Policies
+  * Specify custom backup policies to match environments
+
+???
+
+---
+
+# Re-architecting PeopleSoft
+
+Infrastructure as Clode
+
+* Integration Terraform with Resource Manager
+  * Gitlab integration
+  * Drift Reports
+* Use the psadmin.io Terraform module for instances
+---
+
+# Re-architecting PeopleSoft
+
+Management
+
+* Push notifications to WebHooks/PagerDuty
+* Add OMC log agent to 9.2 instances
+* Expand use of Rundeck for OCI management
+* Leverage Cloud Manager for PeopleSoft Images
+
+---
+
+# psadmin.io Cloud Operations
 
 
 
