@@ -86,7 +86,7 @@ class: center, middle, black
 
 ???
 
-Sub compartments were not a feature when we started out build out. While they have been added, and you can easily move resources to new compartments, we opted to leave it as-is for now.
+Sub compartments were not a feature when we started out build out. While they have been added, and you can easily move resources to new compartments, we opted to leave it as-is for now. We use some tagging, but it's a collection of free form tags that are loosely enforced.
 
 ---
 
@@ -116,13 +116,11 @@ Sub compartments were not a feature when we started out build out. While they ha
 
 ???
 
----
+Our deployment to OCI was designed to extend our on-prem network. This is common for many deployments but it can impose some restrictions on your network. We were given a /24 network to extend the private IP range from our internal network to OCI. We connected on-prem to OCI via a site-to-site VPN.
 
-# Architecting PeopleSoft
+We built 5 subnets, app for non-prod, DMZ, DR, and 2 for the database (client and backup subnets). We built a number of security lists to try and standardize our port openings. 
 
-### Networking
-
-<graphic from OKIT here>
+Additionally, we used the NAT Gateways and Service Gateways to keep our network traffic private.
 
 ---
 
@@ -151,6 +149,12 @@ Sub compartments were not a feature when we started out build out. While they ha
 
 ???
 
+At the time we built our network, subnets were limited to one AD. This means that our networking limited us to working with FDs for HA. Still way better than our previous setup :)
+
+We need to sync back to the ODA, so we use Active Data Guard for the database, and (reliable) rsync for the PeopleSoft servers. 
+
+At the time of our build, we found the OCI load balancer to be missing some features and not up to our standards (slow health check). We are using HA Proxy for now.
+
 ---
 
 # Cloud Technologies
@@ -178,6 +182,12 @@ Sub compartments were not a feature when we started out build out. While they ha
 
 ???
 
+Object Storage is great - it can store and serve large files very easily. Database backups are sent to object store.
+
+The FSS is excellent. It's NFS v3 compatibale file storage that you can mount on your servers. Backups are super simple and incremental. We leverage this for storing our DPK files, other shared files, Documentation, and a few HOMEs. 
+
+We attach block storage to all our instance, and all PS resources are installed there. We use a terraform module to create all of our instances, attach block storage, mount the drives to a consistent location, and associate a backup policy for boot and block drives.
+
 ---
 
 # Cloud Technologies
@@ -199,6 +209,12 @@ Sub compartments were not a feature when we started out build out. While they ha
   * Exadata/DBs
 * Resource Manager only for Cloud Manager
 
+???
+
+Terraform is the foundation for IaC. We used TF to deploy the network, route tables, security lists, instances, Cloud Manager and more. A few exceptions - the Exadata (but that is supported in TF), and some of the inital Tenancy configuration.
+
+Resource Manager was released after we did our build, so we haven't used it for much of the current setup. The exception was cloud manager; we leveraged the CM Marketplace stack for that.
+
 ---
 
 # Cloud Technologies
@@ -219,6 +235,12 @@ Sub compartments were not a feature when we started out build out. While they ha
 * Instances added to OMC for server monitoring
 * Adopting OSMS to replace scripts
 * Using Instance Principals and CLI with Rundeck
+
+???
+
+In addition to the basic OCI monitoring, we licenced Oracle Management Cloud for an additional layer of monitoring and analytics. As part of our provisioning process, we install the OMC agent.
+
+The OS Management Service was released and we are working on adopting it for OS patching. With moving the cloud, this is one area that we are responsible for that is often handled by IT.
 
 ---
 class: center, middle, black
@@ -259,13 +281,15 @@ A question I am still working through - Do we need a DR compartment?
 
 The plan is build DR in another region. Do we need separate policies for DR when they really are production servers, just offline/standby in another region? I don't think so.
 
+Use structured tags and namespaces. Using pre-defined tags and enforcing them will help us build reports and dynamic groups to cover our resources. 
+
 ---
 
 # Re-architecting PeopleSoft
 
 ### Networking
 
-* Single VCN for PeopleSoft
+* Two VCNs for PeopleSoft
   * Separate VCN for Database
 * Build our own network space
   * Use 10. /16 CIDR block
@@ -275,13 +299,7 @@ The plan is build DR in another region. Do we need separate policies for DR when
 
 ???
 
----
-
-# Re-architecting PeopleSoft
-
-### Networking
-
-<graphic from OKIT here>
+Moving to two VCNs is a function of running Running ExaCS than it is a stratetic design. Moving ExaCS between compartments is easy, but not VCNs. OCI has LPGs (local peering gateways) that let you connect two VCNs very easily. We will build a new network for 9.2 that support a bigger IP CIDR block, use regional subnets, and we will use NSGs for anything application specific. Security Lists will only be used for things that are common for a subnet (SSH, RDP, TNS for DB, etc).
 
 ---
 
@@ -292,10 +310,16 @@ The plan is build DR in another region. Do we need separate policies for DR when
 * Leverage Availability Domains and Fault Domains
   * Regional Subnets
   * Exadata tied to an Availability Domain
-* Use Data Guard/FSS/OS for data replication to DR
+* Use Data Guard/FSS/OS/rsync for data replication to DR
 * Use Instance Pools and OCI LB for HA and scalability
 
 ???
+
+Regional subnets will make it easy to use ADs for HA. One thing that does hold us back a bit; the ExaCS is tied to an AD. As we build out our DR in the cloud (move away from an ODA on prem), we will look at other database options that will help with HA.
+
+Instead of rsync as the primary replication tool for DR, we will look at FSS/OS to replicate data between servers. FSS and OS is HA in a region as a service, so we don't worry about that. But we still will use rsync (or similar tool) for syncing to other regions.
+
+We are looking instantiating Instance Pools for every environment, even if they don't need more than a single server. You get a lot of automatic connection with Instance Pools - LB pool and attachments, easier to spin up new/patched systems, etc. (See Kyle's talk on the subnet).
 
 ---
 
@@ -311,6 +335,12 @@ The plan is build DR in another region. Do we need separate policies for DR when
 
 ???
 
+We love FSS, and it's been very reliable. I'm more open to running PS_HOME and the middleware on FSS for simplicity (CPU patching is as easy as mounting a new path). BUT, I still have my reservations; running the binaries locally eliminates a whole class of performance and stability issues by not depending on the network.
+
+We will leverage the cloud manager repository for deploying new environments (tied in with `ioco` in a few slides).
+
+For the most part, we are happy with the delivered Gold, Silver, Bronze backup policies. But for some environments we may look at a custom policy as that's something we couldn't do before.
+
 ---
 
 # Re-architecting PeopleSoft
@@ -318,9 +348,19 @@ The plan is build DR in another region. Do we need separate policies for DR when
 ### Infrastructure as Clode
 
 * Integration Terraform with Resource Manager
-  * Gitlab integration
-  * Drift Reports
+    * Gitlab integration
+    * Drift Reports
 * Use the psadmin.io Terraform module for instances
+    * https://github.com/psadmin-io/oci-tf-ps-instance
+
+???
+
+We want to use Resource Manager more for two main reasons:
+* You can import repos from GitLab! Each Stack can point back to repo and branch which makes managing RM stack easy.
+* Drift Detection will compare what your TF code said to build with what exists in OCI. It will generate a report to tell where the configuraiton has changed. This is excellent for things like Security Lists and NSGs to see if undocumented or unnecessary holes exist.
+
+For our 9.1 environment, I built a TF module to standardized our PS instances. We have rewritten that module and published it on GitHub for anyone to use. It will create an an instance the way we build them, set up the attached storage, backup policies, and more.
+
 ---
 
 # Re-architecting PeopleSoft
@@ -331,6 +371,14 @@ The plan is build DR in another region. Do we need separate policies for DR when
 * Add OMC log agent to 9.2 instances
 * Expand use of Rundeck for OCI management
 * Leverage Cloud Manager for PeopleSoft Images
+
+???
+
+With 9.2 we can use more of Oracle Management Cloud's features, like log analytics.
+
+We want to use Rundeck for more things
+
+I haven't talked much about CM yet. I think CM is great for installing new PIs and we plan to use it for that. We also have Phire installed in our CM environment (TDB on that being a good/bad thing). A reason we aren't looking to use it much more than that is it doesn't understand shared infrastructure well. We opted to use a pre-paid billing model, so we want to utilize our infrastructure but we don't want to overbuild. CM can lead to server sprawl. We also run HR/FS on the same server for each tier, something that CM can't do either. We'll keep evaluating CM and providing feedback to PS, but I'm not as
 
 ---
 class: center, middle, white
