@@ -15,9 +15,9 @@ When we got involved, the servers were extremely outdated. The replacement for t
 
 ---
 
-# Why Move to Hybrid System
+# Hybrid System
 
-* Oracle provided a study on a Hybrid system (2016)
+* Oracle provided a study on a hybrid system (2016)
 --
 * ODA on site for production
 ???
@@ -214,33 +214,6 @@ Terraform is the foundation for IaC. We used TF to deploy the network, route tab
 Resource Manager was released after we did our build, so we haven't used it for much of the current setup. The exception was cloud manager; we leveraged the CM Marketplace stack for that.
 
 ---
-
-# Cloud Technologies
-
-### Management
-
-* Monitoring and Notifications
-* Management Cloud
-* OS Management Service
-* Cloud Shell and CLI
-
----
-
-# Architecting PeopleSoft
-
-### Management
-
-* Instances added to OMC for server monitoring
-* Adopting OSMS to replace scripts
-* Using Instance Principals and CLI with Rundeck
-
-???
-
-In addition to the basic OCI monitoring, we licenced Oracle Management Cloud for an additional layer of monitoring and analytics. As part of our provisioning process, we install the OMC agent.
-
-The OS Management Service was released and we are working on adopting it for OS patching. With moving the cloud, this is one area that we are responsible for that is often handled by IT.
-
----
 class: center, middle, black
 
 # Second Chances
@@ -343,7 +316,7 @@ For the most part, we are happy with the delivered Gold, Silver, Bronze backup p
 
 # Re-architecting PeopleSoft
 
-### Infrastructure as Clode
+### Infrastructure as Code
 
 * Integration Terraform with Resource Manager
     * Gitlab integration
@@ -358,25 +331,6 @@ We want to use Resource Manager more for two main reasons:
 * Drift Detection will compare what your TF code said to build with what exists in OCI. It will generate a report to tell where the configuraiton has changed. This is excellent for things like Security Lists and NSGs to see if undocumented or unnecessary holes exist.
 
 For our 9.1 environment, I built a TF module to standardized our PS instances. We have rewritten that module and published it on GitHub for anyone to use. It will create an an instance the way we build them, set up the attached storage, backup policies, and more.
-
----
-
-# Re-architecting PeopleSoft
-
-### Management
-
-* Push notifications to WebHooks/PagerDuty
-* Add OMC log agent to 9.2 instances
-* Expand use of Rundeck for OCI management
-* Leverage Cloud Manager for PeopleSoft Images
-
-???
-
-With 9.2 we can use more of Oracle Management Cloud's features, like log analytics.
-
-We want to use Rundeck for more things
-
-I haven't talked much about CM yet. I think CM is great for installing new PIs and we plan to use it for that. We also have Phire installed in our CM environment (TDB on that being a good/bad thing). A reason we aren't looking to use it much more than that is it doesn't understand shared infrastructure well. We opted to use a pre-paid billing model, so we want to utilize our infrastructure but we don't want to overbuild. CM can lead to server sprawl. We also run HR/FS on the same server for each tier, something that CM can't do either. We'll keep evaluating CM and providing feedback to PS, but I'm not as
 
 ---
 class: center, middle, white
