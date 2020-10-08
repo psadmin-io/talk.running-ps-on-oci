@@ -6,6 +6,8 @@ class: center, middle, title
 
 ![:img psadmin.io, 30%](images/psadmin_io_white.png)
 
+Session: 101810
+
 ???
 
 Welcome to our session on Running PeopleSoft on Oracle Cloud Infrastructure. This is a popular topic - both from presenters and customers. We hope to give you some insight on why we made the move to OCI, what learned along the way, and where we want to go.
@@ -41,10 +43,19 @@ We've got a story to tell today. After I introducde myself and Jeff, we start wi
 
 # St Paul Public Schools
 
-* Largest School Distric in MN
+* Largest School District in MN
 * 38,000 Students
 * 6,500 Teachers and Staff
 
+---
+
+# Dan Iverson
+
+* PeopleSoft Architect
+* Oracle Cloud Infrastructure Architect
+* [Oracle ACE](https://psadmin.io/ace-dan)
+* [Oracle Certified](https://www.youracclaim.com/users/dan-iverson/badges)
+* 17+ Years using PeopleSoft and Oracle
 
 ---
 
@@ -58,16 +69,6 @@ Providing *PeopleSoft* and *Oracle Cloud* services with a knowledge sharing and 
 * Blog
 * Podcast
 * Community
-
----
-
-# Dan Iverson
-
-* PeopleSoft Architect
-* Oracle Cloud Infrastructure Architect
-* [Oracle ACE](https://psadmin.io/ace-dan)
-* [Oracle Certified](https://www.youracclaim.com/users/dan-iverson/badges)
-* 17+ Years using PeopleSoft and Oracle
 
 ---
 

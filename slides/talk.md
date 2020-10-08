@@ -42,7 +42,7 @@ OCI-C solved a number of problems for SPPS, but it wasn't "great". OCI was matur
 ???
 With the migration to OCI, we upgraded from DB Systems to ExaCS. The plan was to eventually put production on OCI and get the full performance benefits of an Exadata.
 --
-* Migrated Production to OCI (Q1/2020)
+* Migrated Production to OCI (Q2/2020)
   * Use ODA for DR
 ???
 After a number of DR tests, and a week of running production in OCI, we made the switch. To users, it was seamless.
@@ -111,8 +111,6 @@ Sub compartments were not a feature when we started out build out. While they ha
 * Subnets for DMZ, Application, DR, Database
 * Common Security Lists applied to subnets
   * Application, NFS, Database
-* Use Service Gateways for private access to OS
-* Use NAT Gateways for all non-DMZ traffic
 
 ???
 
@@ -201,7 +199,7 @@ We attach block storage to all our instance, and all PS resources are installed 
 
 # Architecting PeopleSoft
 
-### Infrastructure as Clode
+### Infrastructure as Code
 
 * Used Terraform to build most resources
 * Exceptions:
